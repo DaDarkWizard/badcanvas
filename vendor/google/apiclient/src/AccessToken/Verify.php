@@ -198,6 +198,7 @@ class Verify
       );
 
       if ($cache) {
+        date_default_timezone_set('America/New_York');
         $cacheItem->expiresAt(new DateTime('+1 hour'));
         $cacheItem->set($certs);
         $cache->save($cacheItem);
