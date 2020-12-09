@@ -13,7 +13,7 @@
 		header("LOCATION:", $redirect);
 	}
 
-	if(TOKEN_DATA["exp"] >= TOKEN_DATA["iat"])
+	if($_SESSION['TOKEN_DATA']["exp"] >= time())
 	{
 		$_SESSION["redirect"] = "__DIR__login.php";
 		header("LOCATION:", $redirect);
