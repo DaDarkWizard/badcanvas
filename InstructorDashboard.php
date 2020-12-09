@@ -7,7 +7,7 @@
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	if(!isset($_SESSSION["TOKEN_DATA"]))
+	if(!isset($_SESSION["TOKEN_DATA"]))
 	{
 		$_SESSION["redirect"] = "__DIR__login.php";
 		header("LOCATION:", $redirect);
