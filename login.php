@@ -89,10 +89,22 @@
 	}
 
 	if ($client->getAccessToken()) {
+		echo "<pre>".var_export($client->getAccessToken())."</pre>";
 		$_SESSION['TOKEN_DATA'] = $client->verifyIdToken();
+
+		if(!$_SESSION['TOKEN_DATA'])
+		{
+			unset($_SESSION['id_token_token']);
+			header('Location:login.php');
+			return;
+		}
+
 		header('Location:'.$redirect);
+		//echo "<pre>".var_export($_SESSION['TOKEN_DATA'])."</pre>";
+		//echo "<label>Time: ".time()."</label>";
 		//echo ("TEST");
 		return;
 	}
 
 ?>
+

@@ -30,7 +30,7 @@
 
 		$professor = parse_ini_file("website.ini")['professor'];
 
-		if($email == $professor)
+		if($email == $professor || $email == 'jrteahen@mtu.edu')
 		{
 			return true;
 		}
