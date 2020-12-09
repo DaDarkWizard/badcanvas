@@ -33,7 +33,7 @@
 	}
 	else
 	{
-		$redirect = __DIR__./InstructorDashboard.php;
+		$redirect = "InstructorDashboard.php";
 	}
 
 	$_SESSION['login_task'] = $loginTask;
@@ -53,9 +53,8 @@
 		echo "No authentication file could be found!";
 		return;
 	}
-
-	$redirect_uri = __DIR__ . "/login.php";
-
+	$splitServerUri = explode("badcanvas", $_SERVER["REQUEST_URI"]);
+	$redirect_uri = "https://".$_SERVER["HTTP_HOST"].$splitServerUri[0]."badcanvas/login.php";
 	$client = new Google\Client();
 	$client->setAuthConfig($oauth_credentials);
 	$client->setRedirectUri($redirect_uri);
@@ -66,8 +65,10 @@
 
 		// store in the session also
 		$_SESSION['id_token_token'] = $token;
+		var_dump($token);
+		echo("hi<br/>");
 		$client->setAccessToken($token);
-
+		echo("hi<br/>");
 		// redirect back to the example
 		header('Location: ' . filter_var($redirect_uri, FILTER_SANITIZE_URL));
 		return;
@@ -90,6 +91,7 @@
 	if ($client->getAccessToken()) {
 		$_SESSION['TOKEN_DATA'] = $client->verifyIdToken();
 		header('Location:'.$redirect);
+		//echo ("TEST");
 		return;
 	}
 

@@ -1,29 +1,24 @@
 <?php
+	include_once "checklogin.php";
+	
 	session_start();
 	$config = parse_ini_file("db.ini");
-	$professor = parse_ini_file("website.ini")['professor'];
+	
 
 	$dbh = new PDO($config['dsn'], $config['username'],$config['password']);
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	if(!isset($_SESSION["TOKEN_DATA"]))
-	{
-		$_SESSION["redirect"] = "__DIR__login.php";
-		header("LOCATION:", $redirect);
-	}
+	$email = checklogin("InstructorDashboard");
+	$verified = verifyProfessor($email);
 
-	if($_SESSION['TOKEN_DATA']["exp"] >= time())
-	{
-		$_SESSION["redirect"] = "__DIR__login.php";
-		header("LOCATION:", $redirect);
-	}
-
-	if(!(TOKEN_DATA["email_verified"]))
-	{
-		$_SESSION["redirect"] = "LOCATION:__DIR__login.php";
-		header("LOCATION:" $redirect);
-	}
+	//if(!($_SESSION['TOKEN_DATA']["email_verified"]))
+	//{
+	//	$_SESSION["login_task"] = "login";
+	//	$_SESSION["redirect"] = "InstructorDashboard";
+	//	header("LOCATION:" . "login.php");
+	//	return;
+	//}
 
 	#__DIR__
 	#$_SESSION["redirect"] = "LOCATION:login.php";
