@@ -117,12 +117,12 @@
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	$email = checklogin("InstructorDashboard");
+	$email = checklogin("StudentList");
 
 	$verified = verifyProfessor($email);
 
 	echo "<table class='table table-striped table-hover'>";
-	echo "<tr><td>Email</td><td>Name</td><td>Major</td></tr>";
+	echo "<tr><td>Email</td><td>Name</td><td>Major</td><td></td></tr>";
 
 	$i = 0;
 
@@ -130,7 +130,7 @@
 	{
 		echo "<tr id='row".$i."'><td>".$row[0]."</td><td>".$row[1]."</td><td>".$row[2]."</td><td><button class='btn btn-default' type='button' onclick='editRow(\"row".$i."\")'>Edit</button>";
 		echo "<button class='btn btn-danger' type='button' onclick='deleteStudent(\"row".$i."\")'>Delete</button></td></tr>";
-		$i = $i = 1;
+		$i = $i + 1;
 	}
 	echo "<tr id='row".$i."'><td><input class='form-control' type='text' /></td><td><input class='form-control' type='text' /></td><td><input class='form-control' type='text' /></td>";
 	echo "<td><button type='button' class='btn btn-default' onclick='addStudent(\"row".$i."\")'>Add</button></td></tr>";

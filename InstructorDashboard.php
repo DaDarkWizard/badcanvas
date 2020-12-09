@@ -12,6 +12,7 @@
 	$email = checklogin("InstructorDashboard");
 	$verified = verifyProfessor($email);
 
+	
 	//if(!($_SESSION['TOKEN_DATA']["email_verified"]))
 	//{
 	//	$_SESSION["login_task"] = "login";
@@ -23,6 +24,7 @@
 	#__DIR__
 	#$_SESSION["redirect"] = "LOCATION:login.php";
 	#$_SESSION["login_task"] = "LOCATION:InstructorDashboard.php";
+
 ?>
 
 <body>
