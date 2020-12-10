@@ -17,7 +17,7 @@
 <?php
 
 	include_once "checklogin.php";
-	//include_once "InstructorHeader.php";
+	include_once "InstructorHeader.php";
 	
 	session_start();
 	$config = parse_ini_file("db.ini");
@@ -39,7 +39,7 @@
 		return;
 	}
 
-	//echo createInstructorHeader("Exams", "InstructorDashboard", $email);
+	echo createInstructorHeader($email, "InstructorDashboard");
 
 ?>
 
@@ -51,20 +51,48 @@
 
 <div class="list-group">
 
-<button class="list-group-item list-group-item-action text-left" style="border-radius:0">
+<?php
+	foreach($dbh->query("select Exam.ExamName, TotalPoints, TsRelease, TsClose, QuestionCount from
+						Exam left join
+						(select ExamName, Count(*) as QuestionCount from Question) as a
+						on Exam.ExamName = a.ExamName") as $row)
+	{
+		date_default_timezone_set("EST");
+		$expire = date_create($row[3]);
+		$release = date_create($row[2]);
+		$about = "Locked";
+		if($release < date_create())
+		{
+			$about = "Open";
+		}
+		if($expire < date_create())
+		{
+			$about = "Closed";
+		}
+		//$expire = date_format($expire, "M d g:i A");
+		echo '<button class="list-group-item list-group-item-action text-left" style="border-radius:0">';
+
+		echo '<div class="d-flex align-items-center">';
+		echo '<img src="BadRocket.png" class="mr-3"/>';
+		echo '<div class="d-inline-block">';
+		echo '<div class="row no-gutters"><div class="col"><h5 style="color:black;">'.$row[0].'</h5></div></div>';
+		echo '<div class="row no-gutters"><div class="col" style="font-size:.75rem;">';
+		echo '<strong>'.$about.'</strong> | <strong>Due</strong> '.date_format($expire, "M d").' at '.date_format($expire, "g:ia").' | '.$row[1].' pts | 40 Questions';
+		echo '</div></div></div></button>';
+	}
+
+?>
+
+<button class="list-group-item list-group-item-action text-left" style="border-radius:0px 0px 3px 3px;">
 	<div class="d-flex align-items-center">
 	<img src="BadRocket.png" class="mr-3"/>
 	<div class="d-inline-block">
-		<div class="row no-gutters"><div class="col"><h5 style="color:black;">Exam name</h5></div></div>
+		<div class="row no-gutters"><div class="col"><h5 style="color:black;">New Exam</h5></div></div>
 		<div class="row no-gutters"><div class="col" style="font-size:.75rem;">
-			Closed | Due Sep 15 at 12:30pm Sep 15 at 12:30pm | 40 pts | 40 Questions
+			Create new Exam
 		</div></div>
 	</div>
 	</div>
-<button class="">
-</button>
-	
-	
 </button>
 
 </div>
