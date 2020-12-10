@@ -21,10 +21,14 @@
 
 	$email = checklogin("InstructorDashboard");
 	if(!$email)
-    {
-            return;
-    }
+   	{
+		return;
+   	}
 	$verified = verifyProfessor($email);
+	if(!$verified)
+	{
+		return;
+	}
 	echo createInstructorHeader($email, "index.html");
 	//if(!($_SESSION['TOKEN_DATA']["email_verified"]))
 	//{
