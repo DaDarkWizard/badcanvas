@@ -108,7 +108,7 @@
 
 <?php
 	include_once "checklogin.php";
-	
+	include_once "InstructorHeader.php";
 	session_start();
 	$config = parse_ini_file("db.ini");
 	
@@ -121,6 +121,8 @@
 
 	$verified = verifyProfessor($email);
 
+	echo createInstructorHeader($email, "InstructorDashboard.php");
+	
 	echo "<table class='table table-striped table-hover'>";
 	echo "<tr><td>Email</td><td>Name</td><td>Major</td><td></td></tr>";
 
