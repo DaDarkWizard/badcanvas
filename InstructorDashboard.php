@@ -19,6 +19,10 @@
 	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 	$email = checklogin("InstructorDashboard");
+	if(!$email)
+    {
+            return;
+    }
 	$verified = verifyProfessor($email);
 
 	//if(!($_SESSION['TOKEN_DATA']["email_verified"]))
@@ -33,10 +37,6 @@
 	#$_SESSION["redirect"] = "LOCATION:login.php";
 	#$_SESSION["login_task"] = "LOCATION:InstructorDashboard.php";
 
-	if(!$email)
-    {
-            return;
-    }
 ?>
 <div class="container-fluid">
 	<div class="row">
