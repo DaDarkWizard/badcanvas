@@ -25,6 +25,7 @@
 	{
 		if ($email == false)
 		{
+			header("LOCATION:index.html");
 			return false;
 		}
 
@@ -36,6 +37,7 @@
 		}
 		else
 		{
+			header("LOCATION:index.html");
 			return false;
 		}
 	}
