@@ -39,7 +39,15 @@
 	}
 
 	echo createStudentHeader($email);
+
+	echo "<div class='container'><div class='list-group'>";
+	echo "<button>Assignment Quizzes</button>"
+	foreach()
+
+	echo "</div></div>";
+
 ?>
+
 
 </body>
 </html>
