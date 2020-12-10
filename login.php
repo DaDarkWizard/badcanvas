@@ -42,7 +42,7 @@
 	if($loginTask == 'logout')
 	{
 		session_destroy();
-		header("LOCATION:".$redirect);
+		header("LOCATION:index.html");
 		return;
 	}
 

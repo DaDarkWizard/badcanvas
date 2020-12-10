@@ -39,4 +39,25 @@
 			return false;
 		}
 	}
+
+	function verifyStudent($email)
+	{
+		$config = parse_ini_file("db.ini");
+
+		$dbh = new PDO($config['dsn'], $config['username'],$config['password']);
+
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+		foreach($dbh->query("SELECT StudentId FROM Student WHERE StudentId='".$email."'") as $row)
+		{
+			if($row[0] == $email)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
 ?>

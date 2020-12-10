@@ -1,7 +1,7 @@
 <html>
 <body>
 <!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" />
 
 <!-- jQuery library -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -117,12 +117,12 @@
 
 	$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-	$email = checklogin("InstructorDashboard");
+	$email = checklogin("StudentList");
 
 	$verified = verifyProfessor($email);
 
 	echo "<table class='table table-striped table-hover'>";
-	echo "<tr><td>Email</td><td>Name</td><td>Major</td></tr>";
+	echo "<tr><td>Email</td><td>Name</td><td>Major</td><td></td></tr>";
 
 	$i = 0;
 
@@ -130,7 +130,7 @@
 	{
 		echo "<tr id='row".$i."'><td>".$row[0]."</td><td>".$row[1]."</td><td>".$row[2]."</td><td><button class='btn btn-default' type='button' onclick='editRow(\"row".$i."\")'>Edit</button>";
 		echo "<button class='btn btn-danger' type='button' onclick='deleteStudent(\"row".$i."\")'>Delete</button></td></tr>";
-		$i = $i = 1;
+		$i = $i + 1;
 	}
 	echo "<tr id='row".$i."'><td><input class='form-control' type='text' /></td><td><input class='form-control' type='text' /></td><td><input class='form-control' type='text' /></td>";
 	echo "<td><button type='button' class='btn btn-default' onclick='addStudent(\"row".$i."\")'>Add</button></td></tr>";
