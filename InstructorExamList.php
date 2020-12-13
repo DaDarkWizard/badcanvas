@@ -40,7 +40,7 @@
 	}
 
 	echo createInstructorHeader($email, "InstructorDashboard");
-
+	unset($_SESSION["Exam"]);
 ?>
 
 <div class="container">
@@ -50,6 +50,18 @@
 </div>
 
 <div class="list-group">
+
+<script type="text/javascript">
+	function selectExam(id)
+	{
+		var form = $('<form action="EditExam" method="post">' +
+					  '<input type="hidden" name="Exam" value="' + id + '" />' +
+					  '</form>');
+		$('body').append(form);
+		form.submit();
+	}
+</script>
+
 
 <?php
 	foreach($dbh->query("select Exam.ExamName, TotalPoints, TsRelease, TsClose, QuestionCount from
@@ -70,7 +82,7 @@
 			$about = "Closed";
 		}
 		//$expire = date_format($expire, "M d g:i A");
-		echo '<button class="list-group-item list-group-item-action text-left" style="border-radius:0">';
+		echo '<button class="list-group-item list-group-item-action text-left" style="border-radius:0" onclick="selectExam(\''.$row[0].'\')">';
 
 		echo '<div class="d-flex align-items-center">';
 		echo '<img src="BadRocket.png" class="mr-3"/>';
@@ -83,7 +95,7 @@
 
 ?>
 
-<button class="list-group-item list-group-item-action text-left" style="border-radius:0px 0px 3px 3px;">
+<button class="list-group-item list-group-item-action text-left" style="border-radius:0px 0px 3px 3px;" onclick="window.location.href='CreateExam.php'">
 	<div class="d-flex align-items-center">
 	<img src="BadRocket.png" class="mr-3"/>
 	<div class="d-inline-block">

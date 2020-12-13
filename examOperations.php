@@ -7,43 +7,45 @@
 
 		$email = checklogin("InstructorDashboard");
 
-        	$verified = verifyProfessor($email);
+        $verified = verifyProfessor($email);
 
-    		if(!$verified)
-    		{
-        		return;
+    	if(!$verified)
+    	{
+        	return;
 		}
 
 		if($_POST["Operation"] == 'add')
 		{
-			$statement = $dbh->prepare("INSERT INTO Exam (ExamName, TsCreated, TsClose, TotalPoints, TsRelease) Values(:ExamName, :TsCreated, :TsClose, :TotalPoints, :TsRelease)");
+			$statement = $dbh->prepare("INSERT INTO Exam (ExamName, TsClose, TotalPoints, TsRelease) Values(:ExamName, :TsClose, 0, :TsRelease)");
 			$result = $statement->execute(array(":ExamName"    => $_POST["ExamName"],
-							    ":TsCreated"   => $_POST["TsCreated"],
 							    ":TsClose"     => $_POST["TsClose"],
-							    ":TotalPoints" => $_POST["TotalPoints"],
 							    ":TsRelease"   => $_POST["TsRelease"]));
+			echo $result;
 		}
 		else if ($_POST["Operation"] == 'edit')
 		{
-			$statement = $dbh->prepare("UPDATE Exam set ExamName=:ExamName, TsCreated=:TsCreated, TsClose=:TsClose, TotalPoints=:TotalPoints, TsRelease=:TsRelease WHERE ExamName=:OldExamName");
-			$result = $statement->execute(array(":OldExamName" => %_POST["OldExamName"],
+			//echo var_dump($_POST);
+			$statement = $dbh->prepare("UPDATE Exam set ExamName=:ExamName, TsClose=:TsClose, TsRelease=:TsRelease WHERE ExamName=:OldExamName");
+			$result = $statement->execute(array(":OldExamName" => $_POST["OldExamName"],
 						  	    ":ExamName"    => $_POST["ExamName"],
-							    ":TsCreated"   => $_POST["TsCreated"],
-                                                            ":TsClose"     => $_POST["TsClose"],
-                                                            ":TotalPoints" => $_POST["TotalPoints"],
+                                ":TsClose"     => $_POST["TsClose"],
 							    ":TsRelease"   => $_POST["TsRelease"]));
+			echo $result;
 		}
-		else if ($_POST["Operation"] == 'edit')
+		else if ($_POST["Operation"] == 'remove')
 		{
 			$statement = $dbh->prepare("DELETE FROM Exam where ExamName=:ExamName");
 			$result = $statement->execute(array(":ExamName" => $_POST["ExamName"]));
+			echo $result;
 		}
 
 		return;
 	} catch (PDOException $e)
 	{
-		return "ERROR!".$e->getMessage()."<br/>";
-		die();
+		echo "ERROR: ".$e->getMessage();
+		//die();
+		return;
 	}
+	return;
 
 ?>

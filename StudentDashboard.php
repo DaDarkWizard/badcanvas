@@ -1,13 +1,16 @@
 <html>
 <head>
 	<!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
-    <!-- jQuery library -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+	<!-- jQuery library -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-    <!-- Latest compiled JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+	<!-- Popper JS -->
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+	<!-- Latest compiled JavaScript -->
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </head>
 <body>
@@ -38,16 +41,34 @@
 		header("LOCATION:index.html");
 	}
 
-	echo createStudentHeader($email);
-
-	echo "<div class='container'><div class='list-group'>";
-	echo "<button>Assignment Quizzes</button>"
-	foreach()
-
-	echo "</div></div>";
-
+	echo createStudentHeader($email, "index.html");
+	unset($_SESSION["Exam"]);
 ?>
 
+<div class="container">
+
+<div class="border w-100" style="margin-top:15px;padding:12px 6px 12px 6px;background-color:rgb(245,245,245);">
+	<h2>Exams</h2>
+</div>
+
+<div class="list-group">
+
+<script type="text/javascript">
+	function selectExam(id)
+	{
+		var form = $('<form action="EditExam" method="post">' +
+					  '<input type="hidden" name="Exam" value="' + id + '" />' +
+					  '</form>');
+		$('body').append(form);
+		form.submit();
+	}
+</script>
+
+
+
+
+</div>
+</div>
 
 </body>
 </html>
