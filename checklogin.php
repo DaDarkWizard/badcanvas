@@ -1,5 +1,7 @@
 
 <?php
+
+	// Called with a redirect to check the login, returns the email if it exists, redirect and false otherwise.
 	function checkLogin($redirect)
 	{
 		if(!isset($_SESSION['TOKEN_DATA']))
@@ -21,8 +23,10 @@
 		return $_SESSION['TOKEN_DATA']['email'];
 	}
 
+	// Checks if the email is a professor.
 	function verifyProfessor($email)
 	{
+		
 		if ($email == false)
 		{
 			header("LOCATION:index.html");
@@ -45,6 +49,7 @@
 		return false;
 	}
 
+	// Checks if the email is a student.
 	function verifyStudent($email)
 	{
 		$config = parse_ini_file("db.ini");

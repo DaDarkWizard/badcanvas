@@ -1,4 +1,5 @@
 <?php
+	// This file handles all operations for editing choices.
 	try {
 		include_once "checklogin.php";
 		session_start();
@@ -14,6 +15,7 @@
         	return;
 		}
 
+		// add a new choice.
 		if($_POST["Operation"] == 'add')
 		{
 			$statement = $dbh->prepare("INSERT INTO Choice (ExamName, QuestionNumber, ChoiceId, Text) 
@@ -24,6 +26,7 @@
 												":Text" => $_POST["Text"]));
 			echo $statement->rowCount();
 		}
+		// Edit an existing choice.
 		else if ($_POST["Operation"] == 'edit')
 		{
 			$statement = $dbh->prepare("CALL modifyChoice(:ExamName, :QuestionNumber, :ChoiceId, :NewChoiceId, :Text, @result)");
@@ -36,6 +39,7 @@
 			$statement = $dbh->query("Select @result");
 			echo $statement->fetchAll()[0][0];
 		}
+		// Delete a choice.
 		else if ($_POST["Operation"] == 'remove')
 		{	
 			$statement = $dbh->prepare("DELETE from Choice where ExamName=:ExamName and QuestionNumber=:QuestionNumber and ChoiceId=:ChoiceId");

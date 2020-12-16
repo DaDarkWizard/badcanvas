@@ -14,6 +14,8 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </head>
+
+<!-- Removes the spinner from number inputs. -->
 <style>
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
@@ -25,7 +27,7 @@ input::-webkit-inner-spin-button {
 <body>
 
 <?php
-
+	// Setup the login.
 	include_once "checklogin.php";
 	include_once "InstructorHeader.php";
 	
@@ -49,8 +51,10 @@ input::-webkit-inner-spin-button {
 		return;
 	}
 
+	// Print the header.
 	echo createInstructorHeader($email, "InstructorExamList");
 	
+	// Check the exam variable.
 	if(!isset($_SESSION["Exam"]))
 	{
 		if(!isset($_POST["Exam"]))
@@ -64,6 +68,7 @@ input::-webkit-inner-spin-button {
 		}
 	}
 
+	// Get the exam.
 	$examName = $_SESSION["Exam"];
 	$statement = $dbh->prepare("SELECT ExamName, TotalPoints, TsRelease, TsClose from Exam where ExamName=:ExamName");
 	$statement->execute(array(":ExamName" => $_SESSION["Exam"]));
@@ -71,8 +76,8 @@ input::-webkit-inner-spin-button {
 
 	$results = $statement->fetch();
 
+	// Store quick and easy variables for the exam.
 	$examName = $results[0];
-	//$totalPoints = $results[1];
 	$tsRelease = $results[2];
 	$tsClose = $results[3];
 ?>
@@ -81,6 +86,7 @@ input::-webkit-inner-spin-button {
 
 	$.extend(
 	{
+		// Redirects with a post request to the given location.
 		redirectPost: function(location, args)
 		{
 			var form = $('<form></form>');
@@ -100,7 +106,7 @@ input::-webkit-inner-spin-button {
 		}
 	});
 
-
+	// Parses an sql datetime into something readable by datetime-local inputs.
 	function parseDateTime(timeString)
 	{
 		//console.log(timeString);
@@ -117,15 +123,18 @@ input::-webkit-inner-spin-button {
 		return d;
 	}
 
+	// Called when the page is first loaded.
 	function setupPage()
 	{
+		//Parse the datetimes.
 		$("#TsRelease")[0].value = parseDateTime("<?php echo $tsRelease;?>");
 		$("#TsClose")[0].value = parseDateTime("<?php echo $tsClose;?>");
 	}
 
+	// Enable our document load function.
 	$(document).ready(function() {setupPage();});
 
-	
+	// Called when the exam entry needs to tbe updated.
 	function updateExam()
 	{		
 		$.post("examOperations.php",
@@ -137,8 +146,8 @@ input::-webkit-inner-spin-button {
 			TsRelease: new Date($("#TsRelease")[0].value).toISOString().slice(0,19).replace('T', ' ')
 		},
 		function(data, success){
-			console.log(data);
-			console.log(success);
+			
+			// Check returned data.
 			if(data.indexOf("1") == -1)
 			{
 				setupPage();
@@ -160,6 +169,7 @@ input::-webkit-inner-spin-button {
 		});
 	}
 
+	// Add a question to the exam.
 	function addQuestion()
 	{
 		$.post("questionOperations.php",
@@ -173,6 +183,7 @@ input::-webkit-inner-spin-button {
 		});
 	}
 
+	// Remove a question from the exam.
 	function removeQuestion(id)
 	{
 		$.post("questionOperations.php",
@@ -187,16 +198,21 @@ input::-webkit-inner-spin-button {
 		});
 	}
 
+	// Add a choice to a question.
 	function addChoice(questionNumber)
 	{	
+		// store the values from and empty the new choice inputs.
 		var newChoiceId = $("#q" + questionNumber + "addid")[0].value;
 		$("#q" + questionNumber + "addid")[0].value = "";
 		var newChoiceText = $("#q" + questionNumber + "addtext")[0].value;
 		$("#q" + questionNumber + "addtext")[0].value = "";
+
+		// Check that the id is valid.
 		if(newChoiceId == "")
 		{
 			return;
 		}
+		// Post the attempt.
 		$.post("choiceOperations.php",
 		{
 			Operation: "add",
@@ -207,16 +223,22 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{	
+			// Check the return result.
 			if(data.trim() != "1")
 			{
+				// Something went wrong, reload the page.
 				location.reload();
 			}
 			else
 			{
+				// Everythings's ok, create the new choice element and add it to the question.
+
+				// Create the wrapper
 				var newChoice = $("<div></div>");
 				newChoice.attr("class", "list-group-item");
 				newChoice[0].id = "q" + questionNumber + "c" + newChoiceId + "wrapper";
 
+				// Make the radio button.
 				var radio = $('<input type="radio" class="form-check-input" name="radio' + questionNumber + '" />');
 				radio.attr('onclick', 'setCorrectAnswer(' + questionNumber + ', "' + newChoiceId + '")');
 				if(newChoiceId == $("#q" + questionNumber + "correctChoice")[0].value)
@@ -224,47 +246,59 @@ input::-webkit-inner-spin-button {
 					radio.attr("checked", true);
 				}
 
+				// Make the id input.
 				var idInput = $('<input type="text" class="form-control" style="width:100px;" value="' + newChoiceId + '" id="q' + questionNumber + 'c' + newChoiceId + 'id" />');
 				idInput.attr("onchange", "editChoice(" + questionNumber + ", '" + newChoiceId + "')");
 
+				// Make the text input.
 				var textInput = $('<input type="text" class="form-control" value="' + newChoiceText + '" id="q' + questionNumber + 'c' + newChoiceId + 'text" />');
 				textInput.attr("onchange", "editChoice(" + questionNumber + ", '" + newChoiceId + "')");
 
+				// Create the delete button.
 				var deleteButton = $('<button class="btn btn-danger" style="margin-top:32px;" id="q' + questionNumber + 'c' + newChoiceId + 'delete" >Remove</button>');
 				deleteButton.attr("onclick", 'removeChoice(' + questionNumber + ', "' + newChoiceId + '")');
 
+				// Create the outer row div.
 				var rowDiv = $('<div class="row no-gutters" ></div>');
 				newChoice.prepend(rowDiv);
 				
+				// Create first column and add all elements to it.
 				var colDiv = $('<div class="col-2" ></div>');
 				colDiv.prepend(idInput);
 				colDiv.prepend($('<label for="q' + questionNumber + 'c' + newChoiceId + 'id" >Id:</label>'));
 				colDiv.prepend(radio);
 				rowDiv.append(colDiv);
 
+				// Create second column and add all elements to it.
 				colDiv = $('<div class="col-8" ></div>');
 				colDiv.prepend(textInput);
 				colDiv.prepend($('<label for="q' + questionNumber + 'c' + newChoiceId + 'text" >Text:</label>'));
 				rowDiv.append(colDiv);
 
+				// Create third column and add all elements to it.
 				colDiv = $('<div class="col-2 text-right" ></div>');
 				colDiv.prepend(deleteButton);
 				rowDiv.append(colDiv);
 
+				// Add the row to the newChoice element.
 				newChoice.prepend(rowDiv);
 
+				// Put newChoice before the addChoice input.
 				$("#q" + questionNumber + "addwrapper").before(newChoice);
 				
 			}
 		});
 	}
 
+	// Set the correct answer.
 	function setCorrectAnswer(questionNumber, choiceId)
 	{
+		// Verify the radio button wasn't already selected.
 		if(choiceId == $("#q" + questionNumber + "correctChoice")[0].value)
 		{
 			return;
 		}
+		// Post the update operation.
 		$.post("questionOperations.php",
 		{
 			Operation: "edit",
@@ -276,15 +310,19 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
+			// Verify the return result.
 			if(data.trim() != "1")
 			{
+				// Something went wrong, reload the page.
 				location.reload();
 			}
 		});
 	}
 
+	// Remove a choice from the question.
 	function removeChoice(questionNumber, choiceId)
 	{
+		// Post the update operation.
 		$.post("choiceOperations.php",
 		{
 			Operation: "remove",
@@ -294,19 +332,24 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
+			// Verify the returned result.
 			if(data.trim() != "1")
 			{
+				// Something went wrong, reload the page.
 				location.reload();
 			}
 			else
 			{
+				// Remove the choice from the question in the UI.
 				$("#q" + questionNumber + "c" + choiceId + "wrapper").remove();
 			}
 		});
 	}
 
+	// Edits a question.
 	function editQuestion(questionNumber, correctChoiceId)
 	{
+		// Post the operation.
 		$.post("questionOperations.php",
 		{
 			Operation: "edit",
@@ -318,16 +361,19 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
+			// Verify the return result.
 			if(data.trim() != "1")
 			{
-				console.log(data);
+				// Something went wrong, reload the page.
 				location.reload();
 			}
 		});
 	}
 
+	// Edit a choice.
 	function editChoice(questionNumber, oldChoiceId)
 	{
+		// Post the operation.
 		$.post("choiceOperations.php",
 		{
 			Operation: "edit",
@@ -339,37 +385,46 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
+			// Verify the returned result.
 			if(data.trim() != "1")
 			{
+				// Something went wrong, reload the page.
 				location.reload();
 			}
 			else{
-				//console.log($"#")
-				//location.reload();
+				// Get the new choice id.
 				var newChoiceId = $("#q" + questionNumber + "c" + oldChoiceId + "id")[0].value;
+
+				// If the choice id changed, we need to update all elements in the choice.
 				if(oldChoiceId != newChoiceId)
 				{
+					// If this is the correct answer, update the id on the stored correct answer value.
 					if($("#q" + questionNumber + "correctChoice")[0].value == oldChoiceId)
 					{
 						$("#q" + questionNumber + "correctChoice")[0].value = newChoiceId;
 					}
 
+					// Update the id input.
 					$("#q" + questionNumber + "c" + oldChoiceId + "id").removeAttr('onchange');
 					$("#q" + questionNumber + "c" + oldChoiceId + "id").attr('onchange', 'editChoice(' + questionNumber + ', "' + newChoiceId + '")');
 					$("#q" + questionNumber + "c" + oldChoiceId + "id")[0].id = "q" + questionNumber + "c" + newChoiceId + "id";
 
+					// Update the text input.
 					$("#q" + questionNumber + "c" + oldChoiceId + "text").removeAttr('onchange');
 					$("#q" + questionNumber + "c" + oldChoiceId + "text").attr('onchange', 'editChoice(' + questionNumber + ', "' + newChoiceId + '")');
 					$("#q" + questionNumber + "c" + oldChoiceId + "text")[0].id = "q" + questionNumber + "c" + newChoiceId + "text";
 
+					// Update the radio input.
 					$("#q" + questionNumber + "c" + oldChoiceId + "radio").removeAttr('onclick');
 					$("#q" + questionNumber + "c" + oldChoiceId + "radio").attr('onclick', 'setCorrectAnswer(' + questionNumber + ', "' + newChoiceId + '")');
 					$("#q" + questionNumber + "c" + oldChoiceId + "radio")[0].id = "q" + questionNumber + "c" + newChoiceId + "radio";
 
+					// Update the delete button.
 					$("#q" + questionNumber + "c" + oldChoiceId + "delete").removeAttr('onclick');
 					$("#q" + questionNumber + "c" + oldChoiceId + "delete").attr('onclick', 'removeChoice(' + questionNumber + ', "' + newChoiceId + '")');
 					$("#q" + questionNumber + "c" + oldChoiceId + "delete")[0].id = "q" + questionNumber + "c" + newChoiceId + "delete";
 
+					// Update the wrapper.
 					$("#q" + questionNumber + "c" + oldChoiceId + "wrapper")[0].id = "q" + questionNumber + "c" + newChoiceId + "wrapper";
 				}
 				
@@ -377,11 +432,13 @@ input::-webkit-inner-spin-button {
 		});
 	}
 
+	// Deletes the exam.
 	function removeExam()
 	{
+		// Confirm they want the exam deleted.
 		if(confirm("Are you sure you want to delete this Exam?"))
 		{
-			//
+			// Post the requests.
 			$.post("examOperations.php",
 			{
 				Operation: "remove",
@@ -389,6 +446,7 @@ input::-webkit-inner-spin-button {
 			},
 			function (data, success)
 			{
+				// Go back to the exam list.
 				window.location.href="InstructorExamList";
 			});
 		}
@@ -423,6 +481,7 @@ input::-webkit-inner-spin-button {
 
 
 <?php
+	
 	$nextQuestion = 1;
 	$questionStatement = $dbh->prepare("SELECT ExamName, QuestionNumber, Text, Points, CorrectChoice from Question where ExamName=:ExamName order by QuestionNumber");
 	$questionStatement->execute(array(":ExamName" => $_SESSION["Exam"]));

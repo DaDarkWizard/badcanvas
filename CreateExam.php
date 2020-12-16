@@ -18,6 +18,7 @@
 //Extend jquery to make easy post redirects.
 $.extend(
 {
+	// Creates and submits a form to the given location.
     redirectPost: function(location, args)
     {
         var form = $('<form></form>');
@@ -41,6 +42,7 @@ $.extend(
 
 <?php
 
+	// Check the login
 	include_once "checklogin.php";
 	include_once "InstructorHeader.php";
 	
@@ -60,6 +62,7 @@ $.extend(
 		return;
 	}
 
+	// Print out the header.
 	echo createInstructorHeader($email, "InstructorExamList");
 
 ?>
@@ -67,6 +70,7 @@ $.extend(
 
 <script type="text/javascript">
 
+	// Trys to create an exam with the information they entered in.
 	function createExam()
 	{
 		var ExamName = $("#ExamName")[0].value;
@@ -107,6 +111,7 @@ $.extend(
 	}
 </script>
 
+<!-- Form for entering exam info. -->
 <div class="form-group" id="beginQ">
 	<label for="ExamName">Exam Name:</label>
 	<input type="text" class="form-control" placeholder="Enter Exam Name" id="ExamName">
