@@ -28,18 +28,21 @@
 			header("LOCATION:index.html");
 			return false;
 		}
+		$config = parse_ini_file("db.ini");
 
-		$professor = parse_ini_file("website.ini")['professor'];
+		$dbh = new PDO($config['dsn'], $config['username'],$config['password']);
 
-		if($email == $professor || $email == 'jrteahen@mtu.edu' || $email == 'lydikett@ilc.edu')
+		$dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		foreach($dbh->query("SELECT InstructorId FROM Instructor WHERE InstructorId='".$email."'") as $row)
 		{
-			return true;
+			if($row[0] == $email)
+			{
+				return true;
+			}
 		}
-		else
-		{
-			header("LOCATION:index.html");
-			return false;
-		}
+
+		header("LOCATION:index.html");
+		return false;
 	}
 
 	function verifyStudent($email)
@@ -58,6 +61,7 @@
 			}
 		}
 
+		echo $email;
 		return false;
 	}
 

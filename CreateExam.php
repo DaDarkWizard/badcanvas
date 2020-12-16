@@ -66,10 +66,7 @@ $.extend(
 <div class="container">
 
 <script type="text/javascript">
-	function test()
-	{
-		
-	}
+
 	function createExam()
 	{
 		var ExamName = $("#ExamName")[0].value;
@@ -80,7 +77,7 @@ $.extend(
 		console.log(ExamName);
 		console.log(DateRelease);
 		console.log(DateClose);
-		return;
+		
 		$.post("examOperations.php",
 			{
 				Operation: "add",
@@ -124,8 +121,6 @@ $.extend(
 </div>
 <button type="button" class="btn btn-primary" onclick="createExam()">Submit</button>
 </div>
-
-<button type="button" class="btn btn-danger" onclick="test()">TEST</button>
 
 </body>
 </html>

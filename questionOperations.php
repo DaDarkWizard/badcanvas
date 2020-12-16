@@ -17,20 +17,25 @@
 		if($_POST["Operation"] == 'add')
 		{
 			$statement = $dbh->prepare("INSERT INTO Question (ExamName, QuestionNumber, Text, Points, CorrectChoice) 
-										Select :ExamName, Max(QuestionNumber) + 1, '', 0, '' from Question where ExamName=:ExamName");
+										Select :ExamName, IF(Max(QuestionNumber) is NULL, 1, Max(QuestionNumber) + 1), '', 0, '' from Question where ExamName=:ExamName");
 			echo $result = $statement->execute(array(":ExamName"    => $_POST["ExamName"]));
 			echo "hi";
 			echo $result;
 		}
 		else if ($_POST["Operation"] == 'edit')
 		{
-			$statement = $dbh->prepare("CALL editQuestion(:ExamName, :QuestionNumber, :Text, :Points, :CorrectChoice)");
-			$result = $statement->execute(array(":ExamName"    => $_POST["ExamName"],
-												":QuestionNumber"     => $_POST["QuestionNumber"],
-												":Text"   => $_POST["Text"],
-												":Points"   => $_POST["Points"],
-												":CorrectChoice"   => $_POST["CorrectChoice"]));
-			echo $result;
+			$statement = $dbh->prepare("CALL editQuestion(:ExamName, :QuestionNumber, :Text, :Points, :CorrectChoice, @returnResult)");
+			$statement->bindParam(':ExamName', $_POST["ExamName"]);
+			$statement->bindParam(':QuestionNumber', $_POST["QuestionNumber"]);
+			$statement->bindParam(':Text', $_POST["Text"]);
+			$statement->bindParam(':Points', $_POST["Points"]);
+			$statement->bindParam(':CorrectChoice', $_POST["CorrectChoice"]);
+			$statement->execute();
+
+			$statement = $dbh->query("SELECT @returnResult");
+			
+			echo $statement->fetchAll()[0][0];
+			return;
 		}
 		else if ($_POST["Operation"] == 'remove')
 		{

@@ -67,6 +67,8 @@ input::-webkit-inner-spin-button {
 	$examName = $_SESSION["Exam"];
 	$statement = $dbh->prepare("SELECT ExamName, TotalPoints, TsRelease, TsClose from Exam where ExamName=:ExamName");
 	$statement->execute(array(":ExamName" => $_SESSION["Exam"]));
+	
+
 	$results = $statement->fetch();
 
 	$examName = $results[0];
@@ -187,22 +189,82 @@ input::-webkit-inner-spin-button {
 
 	function addChoice(questionNumber)
 	{	
+		var newChoiceId = $("#q" + questionNumber + "addid")[0].value;
+		$("#q" + questionNumber + "addid")[0].value = "";
+		var newChoiceText = $("#q" + questionNumber + "addtext")[0].value;
+		$("#q" + questionNumber + "addtext")[0].value = "";
+		if(newChoiceId == "")
+		{
+			return;
+		}
 		$.post("choiceOperations.php",
 		{
 			Operation: "add",
 			ExamName: "<?php echo $_SESSION['Exam'];?>",
 			QuestionNumber: questionNumber,
-			ChoiceId: $("#q" + questionNumber + "addid")[0].value,
-			Text:	$("#q" + questionNumber + "addtext")[0].value
+			ChoiceId: newChoiceId,
+			Text: newChoiceText
 		},
 		function(data, success)
-		{
-			location.reload();
+		{	
+			if(data.trim() != "1")
+			{
+				location.reload();
+			}
+			else
+			{
+				var newChoice = $("<div></div>");
+				newChoice.attr("class", "list-group-item");
+				newChoice[0].id = "q" + questionNumber + "c" + newChoiceId + "wrapper";
+
+				var radio = $('<input type="radio" class="form-check-input" name="radio' + questionNumber + '" />');
+				radio.attr('onclick', 'setCorrectAnswer(' + questionNumber + ', "' + newChoiceId + '")');
+				if(newChoiceId == $("#q" + questionNumber + "correctChoice")[0].value)
+				{
+					radio.attr("checked", true);
+				}
+
+				var idInput = $('<input type="text" class="form-control" style="width:100px;" value="' + newChoiceId + '" id="q' + questionNumber + 'c' + newChoiceId + 'id" />');
+				idInput.attr("onchange", "editChoice(" + questionNumber + ", '" + newChoiceId + "')");
+
+				var textInput = $('<input type="text" class="form-control" value="' + newChoiceText + '" id="q' + questionNumber + 'c' + newChoiceId + 'text" />');
+				textInput.attr("onchange", "editChoice(" + questionNumber + ", '" + newChoiceId + "')");
+
+				var deleteButton = $('<button class="btn btn-danger" style="margin-top:32px;" id="q' + questionNumber + 'c' + newChoiceId + 'delete" >Remove</button>');
+				deleteButton.attr("onclick", 'removeChoice(' + questionNumber + ', "' + newChoiceId + '")');
+
+				var rowDiv = $('<div class="row no-gutters" ></div>');
+				newChoice.prepend(rowDiv);
+				
+				var colDiv = $('<div class="col-2" ></div>');
+				colDiv.prepend(idInput);
+				colDiv.prepend($('<label for="q' + questionNumber + 'c' + newChoiceId + 'id" >Id:</label>'));
+				colDiv.prepend(radio);
+				rowDiv.append(colDiv);
+
+				colDiv = $('<div class="col-8" ></div>');
+				colDiv.prepend(textInput);
+				colDiv.prepend($('<label for="q' + questionNumber + 'c' + newChoiceId + 'text" >Text:</label>'));
+				rowDiv.append(colDiv);
+
+				colDiv = $('<div class="col-2 text-right" ></div>');
+				colDiv.prepend(deleteButton);
+				rowDiv.append(colDiv);
+
+				newChoice.prepend(rowDiv);
+
+				$("#q" + questionNumber + "addwrapper").before(newChoice);
+				
+			}
 		});
 	}
 
 	function setCorrectAnswer(questionNumber, choiceId)
 	{
+		if(choiceId == $("#q" + questionNumber + "correctChoice")[0].value)
+		{
+			return;
+		}
 		$.post("questionOperations.php",
 		{
 			Operation: "edit",
@@ -214,7 +276,10 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
-			location.reload();
+			if(data.trim() != "1")
+			{
+				location.reload();
+			}
 		});
 	}
 
@@ -229,7 +294,14 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
-			location.reload();
+			if(data.trim() != "1")
+			{
+				location.reload();
+			}
+			else
+			{
+				$("#q" + questionNumber + "c" + choiceId + "wrapper").remove();
+			}
 		});
 	}
 
@@ -246,7 +318,11 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
-			location.reload();
+			if(data.trim() != "1")
+			{
+				console.log(data);
+				location.reload();
+			}
 		});
 	}
 
@@ -263,8 +339,59 @@ input::-webkit-inner-spin-button {
 		},
 		function(data, success)
 		{
-			location.reload();
+			if(data.trim() != "1")
+			{
+				location.reload();
+			}
+			else{
+				//console.log($"#")
+				//location.reload();
+				var newChoiceId = $("#q" + questionNumber + "c" + oldChoiceId + "id")[0].value;
+				if(oldChoiceId != newChoiceId)
+				{
+					if($("#q" + questionNumber + "correctChoice")[0].value == oldChoiceId)
+					{
+						$("#q" + questionNumber + "correctChoice")[0].value = newChoiceId;
+					}
+
+					$("#q" + questionNumber + "c" + oldChoiceId + "id").removeAttr('onchange');
+					$("#q" + questionNumber + "c" + oldChoiceId + "id").attr('onchange', 'editChoice(' + questionNumber + ', "' + newChoiceId + '")');
+					$("#q" + questionNumber + "c" + oldChoiceId + "id")[0].id = "q" + questionNumber + "c" + newChoiceId + "id";
+
+					$("#q" + questionNumber + "c" + oldChoiceId + "text").removeAttr('onchange');
+					$("#q" + questionNumber + "c" + oldChoiceId + "text").attr('onchange', 'editChoice(' + questionNumber + ', "' + newChoiceId + '")');
+					$("#q" + questionNumber + "c" + oldChoiceId + "text")[0].id = "q" + questionNumber + "c" + newChoiceId + "text";
+
+					$("#q" + questionNumber + "c" + oldChoiceId + "radio").removeAttr('onclick');
+					$("#q" + questionNumber + "c" + oldChoiceId + "radio").attr('onclick', 'setCorrectAnswer(' + questionNumber + ', "' + newChoiceId + '")');
+					$("#q" + questionNumber + "c" + oldChoiceId + "radio")[0].id = "q" + questionNumber + "c" + newChoiceId + "radio";
+
+					$("#q" + questionNumber + "c" + oldChoiceId + "delete").removeAttr('onclick');
+					$("#q" + questionNumber + "c" + oldChoiceId + "delete").attr('onclick', 'removeChoice(' + questionNumber + ', "' + newChoiceId + '")');
+					$("#q" + questionNumber + "c" + oldChoiceId + "delete")[0].id = "q" + questionNumber + "c" + newChoiceId + "delete";
+
+					$("#q" + questionNumber + "c" + oldChoiceId + "wrapper")[0].id = "q" + questionNumber + "c" + newChoiceId + "wrapper";
+				}
+				
+			}
 		});
+	}
+
+	function removeExam()
+	{
+		if(confirm("Are you sure you want to delete this Exam?"))
+		{
+			//
+			$.post("examOperations.php",
+			{
+				Operation: "remove",
+				ExamName: "<?php echo $_SESSION['Exam'];?>"
+			},
+			function (data, success)
+			{
+				window.location.href="InstructorExamList";
+			});
+		}
 	}
 
 </script>
@@ -296,12 +423,13 @@ input::-webkit-inner-spin-button {
 
 
 <?php
-
+	$nextQuestion = 1;
 	$questionStatement = $dbh->prepare("SELECT ExamName, QuestionNumber, Text, Points, CorrectChoice from Question where ExamName=:ExamName order by QuestionNumber");
 	$questionStatement->execute(array(":ExamName" => $_SESSION["Exam"]));
 	$qrow = $questionStatement->fetch();
 	while($qrow != null)
 	{
+		echo '<div id="q'.$qrow["QuestionNumber"].'wrapper" >';
 		echo '<div class="border border-bottom-0 w-100" style="margin-top:15px;padding:12px 6px 12px 6px;background-color:rgb(245,245,245);">';
 		echo '<h5 class="mr-3 d-inline-block">Question '.$qrow[1].'</h5>';
 		echo '<button class="btn btn-danger" onclick="removeQuestion('.$qrow[1].')">Delete Question</button>';
@@ -313,6 +441,8 @@ input::-webkit-inner-spin-button {
 
 		echo '<div class="list-group list-group-flush ml-3 mr-3 mb-3">';
 
+		echo '<input type="hidden" value="'.$qrow["CorrectChoice"].'" id="q'.$qrow["QuestionNumber"].'correctChoice" />';
+
 		$choiceStatement = $dbh->prepare("SELECT ExamName, QuestionNumber, ChoiceId, Text from Choice where ExamName=:ExamName and QuestionNumber=:QuestionNumber order by ChoiceId");
 		$choiceStatement->execute(array(":ExamName" => $_SESSION["Exam"], ":QuestionNumber" => $qrow["QuestionNumber"]));
 		$crow = $choiceStatement->fetch();
@@ -320,9 +450,10 @@ input::-webkit-inner-spin-button {
 		while($crow != null)
 		{
 			$cid = 'q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"];
-			echo '<div class="list-group-item" ><div class="row no-gutters" >';
-			echo '<div class="col-2">';
-			echo '<input type="radio" class="form-check-input" name="radio1" '.($crow["ChoiceId"] == $qrow["CorrectChoice"] ? "checked" : ("onclick=\"setCorrectAnswer(".$qrow[1].", '".$crow["ChoiceId"]."')\"") ).' />';
+			echo '<div class="list-group-item" id="q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"].'wrapper"><div class="row no-gutters" >';
+			echo '<div class="col-2" >';
+			echo '<input type="radio" class="form-check-input" name="radio'.$qrow["QuestionNumber"].'" '.($crow["ChoiceId"] == $qrow["CorrectChoice"] ? "checked" : "").(" onclick=\"setCorrectAnswer(".$qrow[1].", '".$crow["ChoiceId"]."')\"");
+			echo 'id="q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"].'radio" />';
 			//echo '<div class="col-2">';
 			echo '<label for="'.$cid.'id" >Id:</label>';
 			echo '<input type="text" class="form-control" style="width:100px;" value="'.$crow["ChoiceId"].'" id="'.$cid.'id" onchange="editChoice('.$qrow[1].', \''.$crow["ChoiceId"].'\')" /></div>';
@@ -330,14 +461,15 @@ input::-webkit-inner-spin-button {
 			echo '<label class="d-inline-block" for="'.$cid.'text" >Text:</label>';
 			echo '<input type="text" class="form-control" value="'.$crow["Text"].'" id="'.$cid.'text" onchange="editChoice('.$qrow[1].', \''.$crow["ChoiceId"].'\')" /></div>';
 			echo '<div class="col-2 text-right">';
-			echo '<button class="btn btn-danger" style="margin-top:32px;" onclick="removeChoice('.$qrow[1].', \''.$crow["ChoiceId"].'\')">Remove</button>';
+			echo '<button class="btn btn-danger" style="margin-top:32px;" onclick="removeChoice('.$qrow[1].', \''.$crow["ChoiceId"].'\')" ';
+			echo 'id="q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"].'delete" >Remove</button>';
 			echo '</div>';
 
 			echo '</div></div>';
 			$crow = $choiceStatement->fetch();
 		}
 
-		echo '<div class="list-group-item" ><div class="row no-gutters">';
+		echo '<div class="list-group-item" id="q'.$qrow["QuestionNumber"].'addwrapper" ><div class="row no-gutters">';
 		echo '<div class="col-2">';
 		echo '<label for="q'.$qrow["QuestionNumber"].'addid" >Id:</label>';
 		echo '<input type="text" class="form-control" style="width:100px;" id="q'.$qrow["QuestionNumber"].'addid" /></div>';
@@ -350,13 +482,17 @@ input::-webkit-inner-spin-button {
 
 		echo '</div>';
 		echo '</div>';
+		echo '</div>';
 
 
-
-
+		$nextQuestion = $nextQuestion + 1;
 		$qrow = $questionStatement->fetch();
 	}
 ?>
+
+<input type="hidden" id="maxQuestionValue" value="<?php echo $nextQuestion; ?>" />
+
+<button class="btn btn-danger mt-3 mb-5 float-left" onclick="removeExam()">DELETE Exam</button> 
 
 <button class="btn btn-success mt-3 mb-5  float-right" onclick="addQuestion()">Add Question</button>
 
