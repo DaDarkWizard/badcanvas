@@ -1,8 +1,6 @@
-
-
-
 <?php
 
+	//funciton to print the header for the student pages, needing an email and a link to go back to
 	function createStudentHeader($email, $link)
 	{
 		$output = "<div class='container-fluid' style='background-color:LightGray;'>";

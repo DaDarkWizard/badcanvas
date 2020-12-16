@@ -16,6 +16,7 @@
 <body>
 
 <?php
+	//Setup Login
 	include_once "InstructorHeader.php";
 	include_once "checklogin.php";
 
@@ -41,6 +42,7 @@
 		header("LOCATION:index.html");
 	}
 
+	//Print header
 	echo createInstructorHeader($email, "InstructorExamList.php");
 
 	if(!isset($_SESSION["Exam"]))
@@ -71,6 +73,7 @@
 <tbody>
 
 <?php
+	//Select statement for getting the student grade for a given exam
 	$statement = $dbh->prepare("SELECT TotalPoints, StudentId, TotalScore
 								from Exam left join TakenExams
 								on Exam.ExamName = TakenExams.ExamName
@@ -79,6 +82,7 @@
 								order by StudentId");
 	$statement->execute(array(":ExamName" => $_SESSION["Exam"]));
 
+	//print in a table the student score next to their student email (id)
 	$row = $statement->fetch();
 	while($row != null)
 	{

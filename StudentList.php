@@ -10,6 +10,8 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 <script type="text/javascript">
+	
+	//this function changes a text row into an editable row 
 	function editRow(rowId)
 	{
 		var row = document.getElementById(rowId);
@@ -27,13 +29,13 @@
 		console.log(majorNode.innerHTML);
 		console.log(buttonNode.innerHTML);
 
-		//idNode.innerHTML = "<input class='form-control' type='text' value='" + idNode.innerHTML + "'/>";
 		nameNode.innerHTML = "<input class='form-control' type='text' value='" + nameNode.innerHTML + "'/>";
 		majorNode.innerHTML = "<input class='form-control' type='text' value='" + majorNode.innerHTML + "'/>";
 		buttonNode.innerHTML = "<button type='button' class='btn btn-success' onclick='submitChanges(\"" + rowId + "\")'>Update</button>" +
 								"<button type='button' class='btn btn-danger' onclick='cancelChanges()'>Cancel</button>";
 	}
 
+	//This function moves changes made on the gui to the database
 	function submitChanges(rowId)
 	{
 		var idNode = $("#" + rowId)[0].children[0];
@@ -54,16 +56,15 @@
 		});
 	}
 
+	//This function cancels changes made but not submited
 	function cancelChanges()
 	{
 		location.reload();
 	}
 
+	//This function deletes a studnet row from the student list
 	function deleteStudent(rowId)
 	{
-		
-
-
 		var idNode = $("#" + rowId)[0].children[0];
 
 		if(!confirm("Are you sure you want to delete " + idNode.innerHTML + "?"))
@@ -82,6 +83,7 @@
 		});
 	}
 
+	//This fucntion adds a student into the student list
 	function addStudent(rowId)
 	{
 		var idNode = $("#" + rowId)[0].children[0];
@@ -107,6 +109,7 @@
 <div class="container">
 
 <?php
+	//Page Setup
 	include_once "checklogin.php";
 	include_once "InstructorHeader.php";
 	session_start();
@@ -120,9 +123,11 @@
 	$email = checklogin("StudentList");
 
 	$verified = verifyProfessor($email);
-
+	
+	//print header
 	echo createInstructorHeader($email, "InstructorDashboard.php");
 	
+	//prints the student list as a table 
 	echo "<table class='table table-striped table-hover'>";
 	echo "<tr><td>Email</td><td>Name</td><td>Major</td><td></td></tr>";
 

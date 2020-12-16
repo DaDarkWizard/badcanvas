@@ -26,6 +26,7 @@ input::-webkit-inner-spin-button {
 
 
 <?php
+	//Setup Login/page
 	include_once "StudentHeader.php";
 	include_once "checklogin.php";
 
@@ -51,6 +52,7 @@ input::-webkit-inner-spin-button {
 		header("LOCATION:index.html");
 	}
 
+	//print header
 	echo createStudentHeader($email, "StudentDashboard");
 
 	if(!isset($_SESSION["Exam"]))
@@ -66,6 +68,7 @@ input::-webkit-inner-spin-button {
 		}
 	}
 
+	//Joins Exam and TakenExams with Questions to get total questions
 	$examName = $_SESSION["Exam"];
 	$statement = $dbh->prepare("SELECT a.ExamName as ExamName, a.TotalPoints as TotalPoints, a.TsRelease as TsRelease, a.TsClose as TsClose,  b.TotalQuestions as TotalQuestions,
 								a.TotalScore as TotalScore, a.Complete as Complete
@@ -82,13 +85,13 @@ input::-webkit-inner-spin-button {
 	$statement->execute(array(":ExamName" => $_SESSION["Exam"],
 							":StudentId" => $email));
 	
-
 	$results = $statement->fetch();
-
+	
+	//sets default timezone
 	date_default_timezone_set("UTC");
 
+	//sets all the selected values above to vars
 	$examName = $results[0];
-	//$totalPoints = $results[1];
 	$tsRelease = $results[2];
 	$tsClose = $results[3];
 	$totalPoints = $results[1];
@@ -98,14 +101,14 @@ input::-webkit-inner-spin-button {
 ?>
 
 <script type="text/javascript">
+	
+	//Takes a mySQL date and makes the date readable
 	function parseDateTime(timeString)
 	{
-		//console.log(timeString);
 		var t = timeString.split(/[- :]/);
 
 		// Apply each element to the Date function
 		var d = new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
-		//console.log(d);
 		d = "" + d.getFullYear() + "-" + 
 				("00" + (d.getMonth() + 1)).substr(-2, 2) +
 				"-" + ("00" + d.getDate()).substr(-2, 2) + "T"
@@ -114,6 +117,7 @@ input::-webkit-inner-spin-button {
 		return d;
 	}
 
+	//This fucntion submits the exam to the database
 	function submitExam()
 	{
 		$.post("studentAnswerOperations.php",
@@ -127,6 +131,7 @@ input::-webkit-inner-spin-button {
 		});
 	}
 
+	//This function looks for a mySQL data and converts it, this function runs after the user loads the page
 	function setupPage()
 	{
 		var mySqlCloseDate = "<?php echo $tsClose; ?>";
@@ -135,7 +140,6 @@ input::-webkit-inner-spin-button {
 
 		// Apply each element to the Date function
 		var d = new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
-		//console.log(d);
 		var hours = (d.getHours() > 12 ? d.getHours() - 12 : d.getHours());
 		d = "<strong>Due</strong> " + d.toLocaleString('default', {month: 'short'}) + " " + d.getDate() +
 		" at " + hours + ":" + ("00" + d.getMinutes()).substr(-2, 2) + (d.getHours() > 12 ? "pm" : "am");
@@ -147,9 +151,9 @@ input::-webkit-inner-spin-button {
 		
 
 	}
-
 	$(document).ready(function() {setupPage();});
 
+	//This function handels choicing and a choice for a question
 	function setAnswerChoice(questionNumber, choiceId)
 	{
 		if(choiceId == $("#q" + questionNumber +"storedAnswer")[0].value)
@@ -184,7 +188,7 @@ input::-webkit-inner-spin-button {
 
 
 
-
+<!-- Header for taking an exam -->
 
 <div class="row">
 
@@ -201,6 +205,7 @@ input::-webkit-inner-spin-button {
 
 <?php
 
+	//left joins QuestionAnsswer and Question to get choices and correct anwsers 
 	$questionStatement = $dbh->prepare("SELECT Question.ExamName as ExamName, Question.QuestionNumber as QuestionNumber, Text, Points, CorrectChoice, Point, ChosenAnswer
 										from Question
 										left join QuestionAnswer
@@ -208,19 +213,22 @@ input::-webkit-inner-spin-button {
 										where Question.ExamName=:ExamName and QuestionAnswer.StudentId=:StudentId
 										order by QuestionNumber;");
 	$questionStatement->execute(array(":ExamName" => $_SESSION["Exam"],
-										":StudentId" => $email));
+									":StudentId" => $email));
+	
+	//Prints the Quiz to either be taken or to show the taken exam's anwsers
 	$qrow = $questionStatement->fetch();
 	while($qrow != null)
 	{
+		//Start of each question
 		echo '<div class="border border-bottom-0 w-100" style="margin-top:15px;padding:12px 6px 12px 6px;background-color:rgb(245,245,245);">';
 		echo '<h5 class="mr-3 d-inline-block">Question '.$qrow[1].'</h5>';
 		echo '<span class="float-right" >';
 
-		if($complete)
+		if($complete)//if the user has completed the exam show the points scored
 		{
 			echo $qrow["Point"].' / '.$qrow["Points"];
 		}
-		else
+		else//if the user has not completed the exam shows the possible points
 		{
 			echo $qrow[3];
 		}
@@ -229,20 +237,26 @@ input::-webkit-inner-spin-button {
 		echo ' Points</span>';
 		echo '</div>';
 
+		//The question text
 		echo '<div class="border w-100" >';
 		echo '<p class="p-3 mb-1" >'.$qrow[2].'</p>';
 
+		//Start of each choice
 		echo '<div class="list-group list-group-flush ml-3 mr-3 mb-3">';
 
+		//gets all the choices in order
 		$choiceStatement = $dbh->prepare("SELECT ExamName, QuestionNumber, ChoiceId, Text from Choice where ExamName=:ExamName and QuestionNumber=:QuestionNumber order by ChoiceId");
 		$choiceStatement->execute(array(":ExamName" => $_SESSION["Exam"], ":QuestionNumber" => $qrow["QuestionNumber"]));
 		$crow = $choiceStatement->fetch();
 
+		//Prints all the choices
 		while($crow != null)
 		{
+			//Choice ID Var
 			$cid = 'q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"];
 			echo '<div class="list-group-item" >';
 
+			//If the user has completed the exam start the spans for tool tip grading arrows
 			if($complete)
 			{
 				echo "<span style='margin:0px 10px 0px -10px;' ";
@@ -262,35 +276,40 @@ input::-webkit-inner-spin-button {
 				echo ">";
 			}
 			echo '<input type="hidden" value="'.$qrow["ChosenAnswer"].'" id="q'.$qrow["QuestionNumber"].'storedAnswer" />';
+			
+			//The radio buttons for choices
 			echo '<input type="radio" ';
-			if(!$complete)
+			if(!$complete) //If the user has not completed the exam let them choice a choice
 			{
 				echo 'class="form-check-input" ';
 			}
 			echo ' ';
 			echo 'name="radio'.$qrow["QuestionNumber"].'" id="q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"].'radio" ';
 
-			if($crow["ChoiceId"] == $qrow["ChosenAnswer"])
+			if($crow["ChoiceId"] == $qrow["ChosenAnswer"]) //if the user had previously choosen this answer mark it
 			{
 				echo "checked ";
 			}
 
-			if(!$complete)
+			if(!$complete) //If the user is till working send the choice to the database
 			{
 				echo "onclick=\"setAnswerChoice(".$qrow[1].", '".$crow["ChoiceId"]."')\" ";
 			}
 			
-			if($complete)
+			if($complete) //if the user has completed the exam don't let them choice anymore
 			{
 				echo ' disabled ';
 			}
 
 			echo '/>';
+			
+			//the end of the span if completed
 			if($complete)
 			{
 				echo "</span>";
 			}
 
+			//ChoiceId and text
 			echo '<strong>'.$crow["ChoiceId"].'</strong> '.$crow["Text"];
 
 			echo '</div>';
@@ -302,13 +321,13 @@ input::-webkit-inner-spin-button {
 	}
 
 	
-
+	//If still working add the submit button
 	if(!$complete)
 	{
 		echo '<button type="button" class="btn btn-success float-right mt-2 mb-5" onclick="submitExam()">Submit</button>';
 		echo '</div>';
 	}
-	else
+	else //show the score for the exam if they are completed
 	{
 		echo '</div>';
 		echo '<div class="col-2">';

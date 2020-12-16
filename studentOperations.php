@@ -1,5 +1,6 @@
 <?php
 try {
+    //This sets up the operations and verifies
     include_once "checklogin.php";
 	
 	session_start();
@@ -18,6 +19,7 @@ try {
         return;
     }
 
+    //operation for addeding a student into the student table
     if($_POST["Operation"] == 'add')
     {
         $statement = $dbh->prepare("INSERT INTO Student (StudentId, Name, Major) Values(:StudentId, :Name, :Major)");
@@ -26,7 +28,7 @@ try {
                                             ":Name" => $_POST["Name"],
                                             ":Major" => $_POST["Major"]));
     }
-    else if ($_POST["Operation"] == 'edit')
+    else if ($_POST["Operation"] == 'edit') //operation for editing a student in the student table
     {
         $statement = $dbh->prepare("UPDATE Student set Name=:Name, Major=:Major where StudentId=:StudentId");
 
@@ -34,16 +36,12 @@ try {
                                             ":Name" => $_POST["Name"],
                                             ":Major" => $_POST["Major"]));
     }
-    else if ($_POST["Operation"] == 'remove')
+    else if ($_POST["Operation"] == 'remove') //operation for removing a student
     {
         $statement = $dbh->prepare("CALL removeStudent(:StudentId)");
         $result = $statement->execute(array(":StudentId" => $_POST["StudentId"]));
     }
-    
 
-
-    // Added this so we aren't left on a blank page. */
-    //header("Location:StudentList");
     return;
 } catch (PDOException $e) {
     return "ERROR!".$e->getMessage()."<br/>";
