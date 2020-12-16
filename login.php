@@ -1,15 +1,16 @@
 <?php
-	//echo pageHeader("Logging you in....");
-	
-	include_once __DIR__ . '/vendor/autoload.php';
-	//include_once "base.php";
 
+	// Get google libraries.
+	include_once __DIR__ . '/vendor/autoload.php';
+
+	// Begin the session
 	session_start();
 
 	// Default redirect.
 	$redirect = null;
 	$loginTask = null;
 
+	// Sets up the login task.
 	if(isset($_POST['login_task']))
 	{
 		$loginTask = $_POST['login_task'];
@@ -23,6 +24,7 @@
 		$loginTask = 'logout';
 	}
 
+	// Sets up the redirect.
 	if(isset($_POST['redirect']))
 	{
 		$redirect = $_POST['redirect'];
@@ -38,7 +40,8 @@
 
 	$_SESSION['login_task'] = $loginTask;
 	$_SESSION['redirect'] = $redirect;
-
+	
+	// Logging out is super easy.
 	if($loginTask == 'logout')
 	{
 		session_destroy();
@@ -46,20 +49,27 @@
 		return;
 	}
 
+	// Get our client secret.
 	$oauth_credentials = "client-secret.json";
 
+	// This shouldn't happen.
 	if(!file_exists($oauth_credentials))
 	{
 		echo "No authentication file could be found!";
 		return;
 	}
+
+	// Setup our redirect uri to work on any url as long as it ends with the badcanvas directory.
 	$splitServerUri = explode("badcanvas", $_SERVER["REQUEST_URI"]);
 	$redirect_uri = "https://".$_SERVER["HTTP_HOST"].$splitServerUri[0]."badcanvas/login.php";
+
+	// Create the OAuth client.
 	$client = new Google\Client();
 	$client->setAuthConfig($oauth_credentials);
 	$client->setRedirectUri($redirect_uri);
 	$client->setScopes('email');
 
+	// We've been sent back from google.
 	if (isset($_GET['code'])) {
 		$token = $client->fetchAccessTokenWithAuthCode($_GET['code']);
 
@@ -74,6 +84,7 @@
 		return;
 	}
 
+	// We need to get a token
 	if (
 		!empty($_SESSION['id_token_token'])
 		&& isset($_SESSION['id_token_token']['id_token'])
@@ -88,8 +99,8 @@
 		return;
 	}
 
+	// Get the token
 	if ($client->getAccessToken()) {
-		echo "<pre>".var_export($client->getAccessToken())."</pre>";
 		$_SESSION['TOKEN_DATA'] = $client->verifyIdToken();
 
 		if(!$_SESSION['TOKEN_DATA'])
@@ -100,9 +111,6 @@
 		}
 
 		header('Location:'.$redirect);
-		//echo "<pre>".var_export($_SESSION['TOKEN_DATA'])."</pre>";
-		//echo "<label>Time: ".time()."</label>";
-		//echo ("TEST");
 		return;
 	}
 

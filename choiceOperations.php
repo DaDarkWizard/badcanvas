@@ -1,6 +1,7 @@
 <?php
 	// This file handles all operations for editing choices.
 	try {
+		// check the login.
 		include_once "checklogin.php";
 		session_start();
 		$config = parse_ini_file("db.ini");

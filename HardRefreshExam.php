@@ -1,5 +1,5 @@
 <?php
-	
+	// Called when we need to reset the exam session variable.
 	include_once "checklogin.php";
 	session_start();
 	$config = parse_ini_file("db.ini");

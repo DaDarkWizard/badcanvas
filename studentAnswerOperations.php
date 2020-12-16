@@ -1,6 +1,7 @@
 <?php
 	try
 	{
+		// Setup the login.
 		include_once "checklogin.php";
 		session_start();
 		$config = parse_ini_file("db.ini");
@@ -15,7 +16,7 @@
 			return;
 		}
 		
-
+		// Edit a question answer
 		if ($_POST["Operation"] == 'edit')
 		{
 			//echo var_dump($_POST);
@@ -26,6 +27,7 @@
 								":StudentId" => $_POST["StudentId"]));
 			echo $statement->rowCount();
 		}
+		// submit an exam.
 		else if ($_POST["Operation"] == "submit")
 		{
 			$statement = $dbh->prepare("CALL submitExam(:ExamName, :StudentId)");

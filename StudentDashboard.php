@@ -16,6 +16,7 @@
 <body>
 
 <?php
+	// Setup the login.
 	include_once "StudentHeader.php";
 	include_once "checklogin.php";
 
@@ -38,16 +39,20 @@
 
 	if(!$verified)
 	{
-		//header("LOCATION:index.html");
+		header("LOCATION:index.html");
 		return;
 	}
 
+	// Print the header.
 	echo createStudentHeader($email, "index.html");
+
+	// Unset the exam
 	unset($_SESSION["Exam"]);
 ?>
 
 <div class="container">
 
+<!-- top of the exam list-->
 <div class="border w-100 border-bottom-0" style="margin-top:15px;padding:12px 6px 12px 6px;background-color:rgb(245,245,245);">
 	<h2>Exams</h2>
 </div>
@@ -55,6 +60,7 @@
 <div class="list-group">
 
 <script type="text/javascript">
+	// Selects a clicked exam.
 	function selectExam(id)
 	{
 		var form = $('<form action="TakeExamCheck" method="post">' +
@@ -64,12 +70,13 @@
 		form.submit();
 	}
 
+	// Creates a nice date from a mySql date.
 	function createDate(mySQLDate)
 	{
 		var t = mySQLDate.split(/[- :]/);
 		// Apply each element to the Date function
 		var d = new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5]));
-		//console.log(d);
+
 		var hours = (d.getHours() > 12 ? d.getHours() - 12 : d.getHours());
 		d = "<strong>Due</strong> " + d.toLocaleString('default', {month: 'short'}) + " " + d.getDate() +
 		" at " + hours + ":" + ("00" + d.getMinutes()).substr(-2, 2) + (d.getHours() > 12 ? "pm" : "am");
@@ -77,8 +84,10 @@
 		return d;
 	}
 
+	//Sets up the page after loading.
 	function setupPage()
 	{
+		// parse all mysql dates on the page.
 		var rowCount = $("#RowCount")[0].value;
 		var i = 0;
 
@@ -89,17 +98,19 @@
 		}
 	}
 
+	// Run the setup page function after the document loads.
 	$(document).ready(function() {setupPage();});
 </script>
 
 <?php
 	$i = 0;
-
+	// Get all exams.
 	foreach($dbh->query("select Exam.ExamName, TotalPoints, TsRelease, TsClose, QuestionCount from
 						Exam left join
 						(select ExamName, Count(*) as QuestionCount from Question) as a
 						on Exam.ExamName = a.ExamName") as $row)
 	{
+		// Parse the current exam date.
 		date_default_timezone_set("EST");
 		$expire = $row[3];
 		$release = date_create($row[2]);
@@ -112,7 +123,8 @@
 		{
 			$about = "Closed";
 		}
-		//$expire = date_format($expire, "M d g:i A");
+		
+		// print one exam out.
 		echo '<button class="list-group-item list-group-item-action text-left" style="border-radius:0" onclick="selectExam(\''.$row[0].'\')" ';
 		if($about == "Locked")
 		{
@@ -138,6 +150,7 @@
 	}
 
 ?>
+<!--Keeps track of the total number of exams.-->
 <input type="hidden" value="<?php echo $i; ?>" id="RowCount" />
 
 </div>

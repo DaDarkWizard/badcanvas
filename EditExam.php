@@ -164,7 +164,6 @@ input::-webkit-inner-spin-button {
 			{
 				$.post("HardRefreshExam.php", {Exam: $("#ExamName")[0].value}, function(data, success){location.reload();});
 				
-				//});
 			}
 		});
 	}
@@ -488,6 +487,7 @@ input::-webkit-inner-spin-button {
 	$qrow = $questionStatement->fetch();
 	while($qrow != null)
 	{
+		// Adds everything needed to edit/view a question.
 		echo '<div id="q'.$qrow["QuestionNumber"].'wrapper" >';
 		echo '<div class="border border-bottom-0 w-100" style="margin-top:15px;padding:12px 6px 12px 6px;background-color:rgb(245,245,245);">';
 		echo '<h5 class="mr-3 d-inline-block">Question '.$qrow[1].'</h5>';
@@ -508,12 +508,12 @@ input::-webkit-inner-spin-button {
 
 		while($crow != null)
 		{
+			// Adds everything to edit/view a choice.
 			$cid = 'q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"];
 			echo '<div class="list-group-item" id="q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"].'wrapper"><div class="row no-gutters" >';
 			echo '<div class="col-2" >';
 			echo '<input type="radio" class="form-check-input" name="radio'.$qrow["QuestionNumber"].'" '.($crow["ChoiceId"] == $qrow["CorrectChoice"] ? "checked" : "").(" onclick=\"setCorrectAnswer(".$qrow[1].", '".$crow["ChoiceId"]."')\"");
 			echo 'id="q'.$qrow["QuestionNumber"].'c'.$crow["ChoiceId"].'radio" />';
-			//echo '<div class="col-2">';
 			echo '<label for="'.$cid.'id" >Id:</label>';
 			echo '<input type="text" class="form-control" style="width:100px;" value="'.$crow["ChoiceId"].'" id="'.$cid.'id" onchange="editChoice('.$qrow[1].', \''.$crow["ChoiceId"].'\')" /></div>';
 			echo '<div class="col-8">';
@@ -527,7 +527,7 @@ input::-webkit-inner-spin-button {
 			echo '</div></div>';
 			$crow = $choiceStatement->fetch();
 		}
-
+		// adds the ability to add a choice
 		echo '<div class="list-group-item" id="q'.$qrow["QuestionNumber"].'addwrapper" ><div class="row no-gutters">';
 		echo '<div class="col-2">';
 		echo '<label for="q'.$qrow["QuestionNumber"].'addid" >Id:</label>';
@@ -549,6 +549,7 @@ input::-webkit-inner-spin-button {
 	}
 ?>
 
+<!-- Data and buttons to delete exam and add questions -->
 <input type="hidden" id="maxQuestionValue" value="<?php echo $nextQuestion; ?>" />
 
 <button class="btn btn-danger mt-3 mb-5 float-left" onclick="removeExam()">DELETE Exam</button> 

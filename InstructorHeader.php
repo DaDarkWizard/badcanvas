@@ -1,4 +1,6 @@
 <?php
+
+    // Creates a header for the instructor page.
 	function createInstructorHeader($email, $link)
 	{
 		$output = "<div class='container-fluid' style='background-color:LightGray;'>";

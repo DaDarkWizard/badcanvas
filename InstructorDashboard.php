@@ -8,6 +8,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
 <?php
+	// Get the login.
 	include_once "InstructorHeader.php";
 	include_once "checklogin.php";
 	
@@ -29,20 +30,12 @@
 	{
 		return;
 	}
-	echo createInstructorHeader($email, "index.html");
-	//if(!($_SESSION['TOKEN_DATA']["email_verified"]))
-	//{
-	//	$_SESSION["login_task"] = "login";
-	//	$_SESSION["redirect"] = "InstructorDashboard";
-	//	header("LOCATION:" . "login.php");
-	//	return;
-	//}
 
-	#__DIR__
-	#$_SESSION["redirect"] = "LOCATION:login.php";
-	#$_SESSION["login_task"] = "LOCATION:InstructorDashboard.php";
+	// Print the header.
+	echo createInstructorHeader($email, "index.html");
 
 ?>
+<!-- basic dashboard for instructor -->
 <div class="container-fluid">
 	<div class="row">
 		<div class="col-sm">
